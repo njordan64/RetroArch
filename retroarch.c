@@ -13969,6 +13969,8 @@ bool command_event(enum event_command cmd, void *data)
             if (hwr)
                memset(hwr, 0, sizeof(*hwr));
 
+            cloud_storage_shutdown();
+
             break;
          }
       case CMD_EVENT_CORE_INIT:
@@ -13988,7 +13990,7 @@ bool command_event(enum event_command cmd, void *data)
 #ifdef HAVE_NETWORKING
             if (settings->bools.cloud_storage_enable)
             {
-               cloud_storage_sync_files();
+               cloud_storage_init();
             }
 #endif
          }
