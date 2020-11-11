@@ -50,6 +50,10 @@
 #include "../cheevos/cheevos.h"
 #endif
 
+#if defined(HAVE_NETWORKING) && defined(HAVE_CLOUD_STORAGE)
+#include "../cloud-storage/cloud_storage.h"
+#endif
+
 #include "../content.h"
 #include "../core.h"
 #include "../file_path_special.h"
@@ -540,6 +544,10 @@ static void undo_save_state_cb(retro_task_t *task,
       void *user_data, const char *error)
 {
    save_task_state_t *state = (save_task_state_t*)task_data;
+
+#if defined(HAVE_NETWORKING) && defined(HAVE_CLOUD_STORAGE)
+   cloud_storage_upload_file(CLOUD_STORAGE_GAME_STATES, state->path);
+#endif
 
    /* Wipe the save file buffer as it's intended to be one use only */
    undo_save_buf.path[0] = '\0';

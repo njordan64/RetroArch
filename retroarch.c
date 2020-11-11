@@ -106,6 +106,9 @@
 #ifdef HAVE_NETWORKING
 #include <net/net_http.h>
 #endif
+#if defined(HAVE_NETWORKING) && defined(HAVE_CLOUD_STORAGE)
+#include "cloud-storage/cloud_storage.h"
+#endif
 
 #ifdef WIIU
 #include <wiiu/os/energy.h>
@@ -142,7 +145,9 @@
 #ifdef HAVE_NETWORKING
 #include <net/net_compat.h>
 #include <net/net_socket.h>
+#ifdef HAVE_CLOUD_STORAGE
 #include <cloud-storage/cloud_storage.h>
+#endif
 #endif
 
 #include <audio/audio_resampler.h>
@@ -12954,6 +12959,10 @@ static bool command_event_main_state(
 
                ret      = true;
                push_msg = false;
+
+#if defined(HAVE_NETWORKING) && defined(HAVE_CLOUD_STORAGE)
+               cloud_storage_upload_file(CLOUD_STORAGE_GAME_STATES, state_path);
+#endif
             }
             break;
          case CMD_EVENT_LOAD_STATE:
@@ -13451,6 +13460,13 @@ bool command_event(enum event_command cmd, void *data)
             if (!success)
                return false;
 #endif
+
+#if defined(HAVE_NETWORKING) && defined(HAVE_CLOUD_STORAGE)
+            if (settings->bools.cloud_storage_enable)
+            {
+               cloud_storage_init();
+            }
+#endif
             break;
          }
       case CMD_EVENT_LOAD_STATE:
@@ -13623,6 +13639,10 @@ bool command_event(enum event_command cmd, void *data)
                subsystem_current_count = 0;
                content_clear_subsystem();
             }
+
+#if defined(HAVE_NETWORKING) && defined(HAVE_CLOUD_STORAGE)
+            cloud_storage_shutdown();
+#endif
          }
          break;
       case CMD_EVENT_CLOSE_CONTENT:
@@ -13969,7 +13989,9 @@ bool command_event(enum event_command cmd, void *data)
             if (hwr)
                memset(hwr, 0, sizeof(*hwr));
 
+#if defined(HAVE_NETWORKING) && defined(HAVE_CLOUD_STORAGE)
             cloud_storage_shutdown();
+#endif
 
             break;
          }
@@ -13987,7 +14009,7 @@ bool command_event(enum event_command cmd, void *data)
             if (!type || !command_event_init_core(settings, p_rarch, *type))
                return false;
 
-#ifdef HAVE_NETWORKING
+#if defined(HAVE_NETWORKING) && defined(HAVE_CLOUD_STORAGE)
             if (settings->bools.cloud_storage_enable)
             {
                cloud_storage_init();

@@ -228,9 +228,11 @@
 
 #define MENU_SETTINGS_LIST_CURRENT_ADD_CMD(list, list_info, str) (*(list))[MENU_SETTINGS_LIST_CURRENT_IDX(list_info)].cmd_trigger_idx = (str)
 
+#if defined(HAVE_NETWORKING) && defined(HAVE_CLOUD_STORAGE)
 #define CLOUD_STORAGE_AUTHORIZE_STATUS_LEN 20
 
 static char cloud_storage_authorize_status_str[CLOUD_STORAGE_AUTHORIZE_STATUS_LEN];
+#endif
 
 #define CONFIG_UINT_CBS(var, label, left, right, msg_enum_base, string_rep, min, max, step) \
       CONFIG_UINT( \
@@ -300,9 +302,11 @@ enum settings_list_type
    SETTINGS_LIST_DIRECTORY,
    SETTINGS_LIST_PRIVACY,
    SETTINGS_LIST_MIDI,
-   SETTINGS_LIST_MANUAL_CONTENT_SCAN,
-   SETTINGS_LIST_CLOUD_STORAGE,
+   SETTINGS_LIST_MANUAL_CONTENT_SCAN
+#if defined(HAVE_NETWORKING) && defined(HAVE_CLOUD_STORAGE)
+   ,SETTINGS_LIST_CLOUD_STORAGE,
    SETTINGS_LIST_CLOUD_STORAGE_PROVIDER
+#endif
 };
 
 struct bool_entry
@@ -3066,7 +3070,7 @@ static void setting_get_string_representation_uint_keyboard_gamepad_mapping_type
 }
 #endif
 
-#ifdef HAVE_NETWORKING
+#if defined(HAVE_NETWORKING) && defined(HAVE_CLOUD_STORAGE)
 static void setting_get_string_representation_uint_cloud_storage_provider(
       rarch_setting_t *setting,
       char *s, size_t len)
@@ -9051,6 +9055,7 @@ static bool setting_append_list(
                parent_group);
          SETTINGS_DATA_LIST_CURRENT_ADD_FLAGS(list, list_info, SD_FLAG_LAKKA_ADVANCED);
 
+#if defined(HAVE_NETWORKING) && defined(HAVE_CLOUD_STORAGE)
          CONFIG_ACTION(
                list, list_info,
                MENU_ENUM_LABEL_CLOUD_STORAGE_SETTINGS,
@@ -9066,6 +9071,7 @@ static bool setting_append_list(
                &group_info,
                &subgroup_info,
                parent_group);
+#endif
 
 #ifdef HAVE_LAKKA
          CONFIG_ACTION(
@@ -18368,6 +18374,7 @@ static bool setting_append_list(
          END_SUB_GROUP(list, list_info, parent_group);
          END_GROUP(list, list_info, parent_group);
          break;
+#if defined(HAVE_NETWORKING) && defined(HAVE_CLOUD_STORAGE)
       case SETTINGS_LIST_CLOUD_STORAGE:
          START_GROUP(list, list_info, &group_info,
                msg_hash_to_str(MENU_ENUM_LABEL_VALUE_CLOUD_STORAGE_SETTINGS),
@@ -18481,6 +18488,7 @@ static bool setting_append_list(
          END_SUB_GROUP(list, list_info, parent_group);
          END_GROUP(list, list_info, parent_group);
          break;
+#endif
       case SETTINGS_LIST_LAKKA_SERVICES:
          {
 #if defined(HAVE_LAKKA)
@@ -19724,8 +19732,10 @@ static rarch_setting_t *menu_setting_new_internal(rarch_setting_info_t *list_inf
       SETTINGS_LIST_CHEEVOS,
       SETTINGS_LIST_CORE_UPDATER,
       SETTINGS_LIST_NETPLAY,
+#if defined(HAVE_NETWORKING) && defined(HAVE_CLOUD_STORAGE)
       SETTINGS_LIST_CLOUD_STORAGE,
       SETTINGS_LIST_CLOUD_STORAGE_PROVIDER,
+#endif
       SETTINGS_LIST_LAKKA_SERVICES,
       SETTINGS_LIST_USER,
       SETTINGS_LIST_USER_ACCOUNTS,
